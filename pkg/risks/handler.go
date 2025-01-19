@@ -27,6 +27,14 @@ func JsonContentTypeMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 // Get all Risks
 func GetRisks(w http.ResponseWriter, r *http.Request) {
+	// Send empty list instead of null if no risks are present
+	if len(risks) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode([]Risk{}) // Encode as an empty array
+		return
+	}
+
 	var riskList []Risk
 	for _, risk := range risks {
 		riskList = append(riskList, risk)

@@ -2,10 +2,11 @@ package main
 
 import (
 	"net/http"
-	"testing"
 	"net/http/httptest"
 	"strings"
+	"testing"
 )
+
 func TestHomeHandler(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rr := httptest.NewRecorder()
@@ -24,4 +25,3 @@ func TestHomeHandler(t *testing.T) {
 		t.Errorf("expected body %q, got %q", expected, rr.Body.String())
 	}
 }
-

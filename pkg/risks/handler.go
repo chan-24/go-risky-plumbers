@@ -31,7 +31,10 @@ func GetRisks(w http.ResponseWriter, r *http.Request) {
 	if len(risks) == 0 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode([]Risk{}) // Encode as an empty array
+		if err := json.NewEncoder(w).Encode([]Risk{}); err != nil {
+			http.Error(w, "Error Encoding", http.StatusInternalServerError)
+			return
+		} // Encode as an empty array
 		return
 	}
 
@@ -42,7 +45,11 @@ func GetRisks(w http.ResponseWriter, r *http.Request) {
 
 	// Return the risks as JSON
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(riskList)
+
+	if err := json.NewEncoder(w).Encode(riskList); err != nil {
+		http.Error(w, "Error Encoding", http.StatusInternalServerError)
+		return
+	}
 }
 
 // Create a new Risk
@@ -75,8 +82,11 @@ func CreateRisk(w http.ResponseWriter, r *http.Request) {
 
 	// Return the created risk
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newRisk)
 
+	if err := json.NewEncoder(w).Encode(newRisk); err != nil {
+		http.Error(w, "Error Encoding", http.StatusInternalServerError)
+		return
+	}
 }
 
 // Get Risk by ID
@@ -93,5 +103,10 @@ func GetRiskByID(w http.ResponseWriter, r *http.Request) {
 
 	// Return the risk as JSON
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(risk)
+
+	if err := json.NewEncoder(w).Encode(risk); err != nil {
+		http.Error(w, "Error Encoding", http.StatusInternalServerError)
+		return
+	}
+
 }

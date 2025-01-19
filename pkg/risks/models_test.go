@@ -3,18 +3,15 @@ package risks
 import "testing"
 
 func Test_isValidState(t *testing.T) {
-	type args struct {
-		state State
-	}
 	tests := []struct {
 		state State
-		want bool
+		want  bool
 	}{
 		{Open, true},
 		{Closed, true},
 		{Accepted, true},
 		{Investigating, true},
-		{"invalid", false}, 
+		{"invalid", false},
 		{"", false},
 	}
 	for _, tt := range tests {

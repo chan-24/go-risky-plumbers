@@ -2,13 +2,12 @@ package risks
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
-	"testing"
 	"net/http/httptest"
 	"strings"
-	"encoding/json"
+	"testing"
 )
-
 
 func TestEmptyGetRisks(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/v1/risks", nil)
@@ -28,7 +27,7 @@ func TestEmptyGetRisks(t *testing.T) {
 
 // Post a risk and Get same risk by UUID
 func TestPostRisks(t *testing.T) {
-	
+
 	jsonData := `{
 		"state": "open",
 		"title": "r1",
@@ -36,7 +35,7 @@ func TestPostRisks(t *testing.T) {
 	}`
 
 	// Create a new HTTP request with the JSON payload
-	req := httptest.NewRequest(http.MethodPost, "/v1/risks",  bytes.NewReader([]byte(jsonData)))
+	req := httptest.NewRequest(http.MethodPost, "/v1/risks", bytes.NewReader([]byte(jsonData)))
 	req.Header.Set("Content-Type", "application/json")
 
 	rr := httptest.NewRecorder()
@@ -65,7 +64,6 @@ func TestPostRisks(t *testing.T) {
 		t.Errorf("expected status %v, got %v", http.StatusOK, getRR.Code)
 	}
 
-	
 	var fetchedRisk Risk
 	err = json.NewDecoder(getRR.Body).Decode(&fetchedRisk)
 	if err != nil {
@@ -76,5 +74,43 @@ func TestPostRisks(t *testing.T) {
 	}
 	if fetchedRisk.Title != "r1" {
 		t.Errorf("expected Name %v, got %v", "r1", fetchedRisk.Title)
+	}
+}
+
+func TestInvalidPostRisks(t *testing.T) {
+
+	jsonData := `{
+		"state": "invalid",
+		"title": "r1",
+		"description": "low risk"
+	}`
+
+	// Create a new HTTP request with the JSON payload
+	req := httptest.NewRequest(http.MethodPost, "/v1/risks", bytes.NewReader([]byte(jsonData)))
+	req.Header.Set("Content-Type", "application/json")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(CreateRisk)
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("expected status %v, got %v", http.StatusBadRequest, rr.Code)
+	}
+
+	jsonData = `{
+		"title": "r1",
+		"description": "low risk"
+	}`
+
+	// Create a new HTTP request with the JSON payload
+	req = httptest.NewRequest(http.MethodPost, "/v1/risks", bytes.NewReader([]byte(jsonData)))
+	req.Header.Set("Content-Type", "application/json")
+
+	rr = httptest.NewRecorder()
+	handler = http.HandlerFunc(CreateRisk)
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("expected status %v, got %v", http.StatusBadRequest, rr.Code)
 	}
 }
